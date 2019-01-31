@@ -143,7 +143,7 @@ We have apply some manual patches gleaned from the two guides:
 We are now ready to continue. Before proceeding, say 
 ```shell
 ulimit -n 1024 
-``´
+```
 to increase the maximum number of open file handles to 1024. The system default set by macOS will not be sufficient. 
 
 Then we can continue with the next step in Crosstool-NG, which is

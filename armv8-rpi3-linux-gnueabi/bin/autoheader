@@ -1,8 +1,8 @@
-#! /usr/local/bin/perl
+#! /usr/bin/perl
 # -*- Perl -*-
 # Generated from autoheader.in; do not edit by hand.
 
-eval 'case $# in 0) exec /usr/local/bin/perl -S "$0";; *) exec /usr/local/bin/perl -S "$0" "$@";; esac'
+eval 'case $# in 0) exec /usr/bin/perl -S "$0";; *) exec /usr/bin/perl -S "$0" "$@";; esac'
     if 0;
 
 # autoheader -- create `config.h.in' from `configure.ac'

@@ -1,8 +1,8 @@
-#! /usr/local/bin/perl -w
+#! /usr/bin/perl -w
 # -*- perl -*-
 # Generated from ifnames.in; do not edit by hand.
 
-eval 'case $# in 0) exec /usr/local/bin/perl -S "$0";; *) exec /usr/local/bin/perl -S "$0" "$@";; esac'
+eval 'case $# in 0) exec /usr/bin/perl -S "$0";; *) exec /usr/bin/perl -S "$0" "$@";; esac'
     if 0;
 
 # ifnames - print the identifiers used in C preprocessor conditionals

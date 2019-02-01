@@ -1,8 +1,13 @@
-# Cross-compiling toolchain for macOS Mojave 10.14 host and Raspberry Pi 3 Raspbian Stretch target
+# Cross-compiling toolchain for macOS Mojave 10.14 host and Raspberry Pi Model 3 B+ Raspbian Stretch target
 
 ## Description and acknowledgements
 
-This is a basic GNU toolchain for Mac to RPi3 cross compilation. The build is based on the procedure described in detail in the following two sources:
+This is a basic GNU toolchain for Mac to RPi Model 3 B+ cross compilation, with  
+
+- hard-float ABI, and 
+- optimisation for Cortex-A53 CPU and Noen-Cortex-v8 FPU.
+
+The toolchain build was based on the procedure described in detail in the following two sources:
 
 - [Guide no. 1 by Jared Wolff](https://www.jaredwolff.com/cross-compiling-on-mac-osx-for-raspberry-pi/#show1)
 - [Guide no. 2 by Yuzhou Cheng](https://medium.com/coinmonks/setup-gcc-8-1-cross-compiler-toolchain-for-raspberry-pi-3-on-macos-high-sierra-cb3fc8b6443e)
@@ -108,6 +113,38 @@ CT_LOCAL_PATCH_DIR="/Volumes/xtools-scratch/packages"
 ```
 
 This summarises the most important changes to `.config`. The file is also part of this repository. 
+
+## Crosstool-NG fine tuning for hard-float and optimization for Cortex-A53 CPUs and their NEON-Cortex-v8 FPUs
+
+The Raspberry Model 3 B and 3 B+ are based on a Broadcom BCM2837 SoC which has four Cortex-A53 cores. Each of these cores has a Neon-Cortex-v8 FPU. 
+
+Since there are FPUs present, it makes sense to base the toolchain on the hard-float ABI. Otherwise, we are sacrificing performance, which may severely limit the applicability of software compiled with this toolchain for the RPi 3 B+ platform. 
+
+Moreover, NEON allows the parallel execution of up to four FP operations, so it is to be expected that optimisation of FP operations that takes this into account will be much more efficient than without these optimisations. 
+
+In order to activate these optimisations (and some others) in the toolchain, the following configuration is passed to Crosstool-NG:
+```shell
+CT_ARCH_SUPPORTS_WITH_ARCH=y
+CT_ARCH_SUPPORTS_WITH_CPU=y
+CT_ARCH_SUPPORTS_WITH_TUNE=y
+CT_ARCH_SUPPORTS_WITH_FLOAT=y
+CT_ARCH_SUPPORTS_WITH_FPU=y
+CT_ARCH_SUPPORTS_SOFTFP=y
+CT_ARCH_EXCLUSIVE_WITH_CPU=y
+CT_ARCH_CPU="cortex-a53"
+CT_ARCH_FPU="neon-fp-armv8"
+CT_ARCH_FLOAT_HW=y
+CT_TARGET_CFLAGS=""
+CT_TARGET_LDFLAGS=""
+CT_ARCH_FLOAT="hard"
+CT_ARCH_ARCH_CFLAG="armv8-a+crc"
+CT_ARCH_ABI_FLAG="aapcs-linux"
+CT_ARCH_CPU_CFLAG="cortex-a53"
+CT_ARCH_FLOAT_CFLAG="hard-float"
+CT_ARCH_TUNE_CFLAG="cortex-a53"
+CT_ARCH_ENDIAN_CFLAG="little-endian"
+CT_ARCH_TARGET_CLFAGS="-funsafe-math-optimizations -mtls-dialect=gnu2 -munaligned-access -mvectorize-with-neon-quad"
+```
 
 ## Crosstool-NG: First and second run
 

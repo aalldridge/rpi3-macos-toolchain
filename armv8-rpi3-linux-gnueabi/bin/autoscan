@@ -1,4 +1,4 @@
-#! /usr/local/bin/perl -w
+#! /usr/bin/perl -w
 # -*- perl -*-
 # Generated from autoscan.in; do not edit by hand.
 
@@ -20,7 +20,7 @@
 
 # Written by David MacKenzie <djm@gnu.ai.mit.edu>.
 
-eval 'case $# in 0) exec /usr/local/bin/perl -S "$0";; *) exec /usr/local/bin/perl -S "$0" "$@";; esac'
+eval 'case $# in 0) exec /usr/bin/perl -S "$0";; *) exec /usr/bin/perl -S "$0" "$@";; esac'
     if 0;
 
 BEGIN

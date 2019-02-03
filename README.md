@@ -5,7 +5,7 @@
 This is a basic GNU toolchain for Mac to RPi Model 3 B+ cross compilation, with  
 
 - hard-float ABI, and 
-- optimisation for Cortex-A53 CPU and Noen-Cortex-v8 FPU.
+- optimisation for Cortex-A53 CPU and Neon-Cortex-v8 FPU.
 
 The toolchain build was based on the procedure described in detail in the following two sources:
 
@@ -14,7 +14,7 @@ The toolchain build was based on the procedure described in detail in the follow
 
 The updated version of Jared Wolff's guide (referred to in the following as *Guide no. 1*) is geared towards a host running OS X 10.11.6 and a Pi 2 or Pi 3 B target. The comments on his page contain a wealth of helpful information for later configurations. Yuzhou Cheng's guide (referred to as *Guide no. 2* in the following) updates Jared Wolff's procedure to a host running OS X 10.13.6 and has a number of helpful troubleshooting hints. Moreover, his configuration allows for much more recent versions of the tools involved, e.g. gcc 8.1.0.
 
-This document describes how I needed to update the procedure to work on a host running macOS Mojave 10.14.2. The procedure also installs the latest version of the available tools at the time of writing. One exception are the Linux kernel headers which were taken to be version 4.14.79. This is the kernel version of the current Raspbian Stretch release at the time of writing. 
+This document describes how I needed to update the procedure to work on a host running macOS Mojave 10.14.2. The procedure also installs the versions of all tool available of Raspbian Stretch at the time of writing. One exception is GCC, which is installed in version 6.3.0 on my RPi 3 target. There are no working Crosstool-NG patches available for this version, so I have chosen to go with GCC 6.5.0.
 
 **Before proceeding, make yourself familiar with Crosstool-NG.** I highly recommend the overview in *Guide no. 2*. I learnt everything I needed to know there. 
 
@@ -73,27 +73,27 @@ CT_PREFIX_DIR="/Volumes/rpi-xtools/${CT_TARGET}"
 It is necessary to configure Crosstool-NG in `.config` to install the latest versions of the tools. Since the `menuconfig` option will not reflect the latest versions, it is best to do this manually using some text editor of your persuasion. In my case, the requisite settings are: 
 ```shell
 CT_KERNEL_VERSION="4.14.79"
-CT_BINUTILS_VERSION="2.31"
-CT_LIBC_VERSION="2.28"
-CT_CC_GCC_VERSION="8.2.0"
-CT_DUMA_VERSION="2_5_15"
-CT_GDB_VERSION="8.2"
+CT_BINUTILS_VERSION="2.28"
+CT_LIBC_VERSION="2.24"
+CT_CC_GCC_VERSION="6.5.0"
+CT_GDB_VERSION="7.12.1"
 CT_LTRACE_VERSION="0.7.3"
-CT_STRACE_VERSION="4.26"
-CT_ZLIB_VERSION="1.2.11"
+CT_STRACE_VERSION="4.15"
+CT_ZLIB_VERSION="1.2.8"
 CT_LIBICONV_VERSION="1.15"
 CT_GETTEXT_VERSION="0.19.8.1"
 CT_GMP_VERSION="6.1.2"
 CT_MPFR_VERSION="3.1.5"
-CT_ISL_VERSION="0.20"
-CT_MPC_VERSION="1.1.0"
+CT_ISL_VERSION="0.19.8.1"
+CT_MPC_VERSION="1.0.3"
 CT_LIBELF_VERSION="0.8.13"
-CT_EXPAT_VERSION="2.2.6"
+CT_EXPAT_VERSION="2.2.0"
 CT_NCURSES_VERSION="6.0"
 CT_AUTOCONF_VERSION="2.69"
+CT_AUTOMAKE_VERSION="1.15"
 CT_LIBTOOL_VERSION="2.4.6"
 CT_M4_VERSION="1.4.18"
-CT_MAKE_VERSION="4.2.1"
+CT_MAKE_VERSION="4.1"
 ```
 
 Crosstool-NG will only build successfully with these versions set if the corresponding patches are in place. To that end, clone the Crosstools-NG repository, viz. 
@@ -111,6 +111,8 @@ CT_PATCH_SINGLE=y
 CT_PATCH_USE_LOCAL=y
 CT_LOCAL_PATCH_DIR="/Volumes/xtools-scratch/packages"
 ```
+
+For some tools, there are no corresponding patches available. This may be a problem, in particular for the target libraries, if the versions installed on your target are different. For this reason, I have chosen not to build zlib for the toolchain. For GCC, I need to opt for a version different from that on my target, namely 6.5.0 instead of 6.3.0, since I could not find working patches. In case of other inconsistencies, you may have to manually upgrade the versions of libraries on your target.
 
 This summarises the most important changes to `.config`. The file is also part of this repository. 
 
@@ -158,7 +160,7 @@ This will fail. First, it might happen that some of the tarball downloads fail. 
 
 Secondly, you will most probably experience trouble when building `make`. Just run `autoreconf` in `/Volumes/xtools-scratch/.build/src/make-whatever-the-version`.
 
-At this point, it is important that you previously installed `guile` using Homebrew. If not, you may have to install it, add some paths to your `~/.bash_profile`, load them via `source ~/.bash_profile`, and rerun `autoconf`. 
+At this point, it is important that you previously installed `guile` using Homebrew. If not, you may have to install it, add some paths to your `~/.bash_profile`, load them via `source ~/.bash_profile`, and rerun `autoreconf`. 
 
 Once this has completed successfully, reinvoke 
 ```shell
